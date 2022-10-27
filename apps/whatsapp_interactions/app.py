@@ -1,3 +1,4 @@
+from inspect import stack
 import pandas as pd
 import streamlit as st
 import plotly.express as px
@@ -72,6 +73,9 @@ if raw_file and "text" in raw_file.type:
     
     df_bar = df_filter.sender.value_counts().reset_index()
 
+    mean_line = int(df_bar.mean())
+    median_line = int(df_bar.median())
+
     #create plot
     fig = px.bar(df_bar,
                 x="index",
@@ -79,9 +83,26 @@ if raw_file and "text" in raw_file.type:
                 text_auto='.2s',
                 title="Number of interations",
                 labels={"sender":"Interactions", "index":"Participants"},
-                height=500)
+                height=550)
+
+    fig.add_hline(y=mean_line,
+                  line_dash="dot",
+                  annotation_text=f"Mean ({mean_line})",
+                  annotation_position="bottom right",
+                  line_color="red")
+
+    fig.add_hline(y=median_line,
+                  line_dash="dot",
+                  annotation_text=f"Median ({median_line})",
+                  annotation_position="bottom right",
+                  line_color="green")
+
+    fig.add_bar(x=["Mean"], y=[mean_line], name="b")
+
+    fig.add_bar(x=["Median"], y=[median_line], name="b")
 
     fig.update_xaxes(tickangle=90)
+
 
     #display plot
     tab1.plotly_chart(fig, use_container_width=True)
